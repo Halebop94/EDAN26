@@ -6,8 +6,8 @@ PRINT   = 1
 
 all:
 	@mkdir -p classes
-	scalac -g:vars -d classes dataflow.scala
-	scalac -deprecation -d classes dataflow.scala
+	#scalac -g:vars -d classes dataflow.scala
+	#scalac -deprecation -d classes dataflow.scala
 	scalac -deprecation -optimise -d classes dataflow.scala
 	scala -classpath classes Driver $(NSYM) $(NVERTEX) $(MAXSUCC) $(NACTIVE) $(PRINT)
 
