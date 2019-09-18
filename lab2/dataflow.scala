@@ -25,7 +25,7 @@ class Random(seed: Int) {
         }
 }
 
-class Controller(val cfg: Array[Vertex]) extends Actor {
+class Controller(val cfg: Array[Vertex], val print : Int, val nvertex: Int) extends Actor {
   var started = 0;
   var changeCounter = 0;
   var begin   = System.currentTimeMillis();
@@ -58,7 +58,7 @@ class Controller(val cfg: Array[Vertex]) extends Actor {
         if(changeCounter == 0) {
           for(actor <- cfg) actor ! new Stop();
           var end = System.currentTimeMillis();
-          println("T= " + (end - start)/1e9 + " s");
+          System.out.println("T= " + (end-start)/1e9 + " s");
           if(print != 0) {
             for(i <- 0 until nvertex) cfg(i).print;
           }
@@ -187,7 +187,7 @@ object Driver {
     nactive        = args(3).toInt;
     val print      = args(4).toInt;
     val cfg        = new Array[Vertex](nvertex);
-    val controller = new Controller(cfg);
+    val controller = new Controller(cfg, print, nvertex);
 
     controller.start;
 
