@@ -52,10 +52,11 @@ class Controller(val cfg: Array[Vertex]) extends Actor {
         changeCounter-=1;
         if(changeCounter == 0){
           for(actor <- cfg) actor ! new Stop;
+          val end = System.currentTimeMillis - begin;
+          println(end + " end time");
+          act();
         }
-        val end = System.currentTimeMillis - begin;
-        println(end + " end time");
-        act();
+
       }
     }
   }
