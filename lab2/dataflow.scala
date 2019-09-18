@@ -58,7 +58,7 @@ class Controller(val cfg: Array[Vertex], val print : Int) extends Actor {
         if(changeCounter == 0) {
           for(actor <- cfg) actor ! new Stop();
           var end = System.currentTimeMillis();
-          println("T= " + (end - start)/1e9 + " s");
+          System.out.println("T = " + (end-start)/1e9 + " s");
           if(print != 0) {
             for(i <- 0 until cfg.length) cfg(i).print;
           }
