@@ -9,7 +9,8 @@ case class RequestIn(v: Vertex);
 case class Ready();
 case class Go();
 case class Change(in: BitSet);
-case class Inactive();
+case class Changing();
+case class ChangeDone();
 
 class Random(seed: Int) {
         var w = seed + 1;
@@ -96,7 +97,7 @@ class Vertex(val index: Int, s: Int, val controller: Controller) extends Actor {
           in = new BitSet(s);
           in.or(out);
           in.andNot(defs);
-			    in.or(use);
+			    in.or(uses);
 
           if(!in.equals(old)){
               for(vertex <- pred) {vertex ! new Go;}
