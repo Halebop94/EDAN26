@@ -211,4 +211,3 @@ object Driver {
       for (i <- 0 until nvertex)
         cfg(i).print;
   }
-}
