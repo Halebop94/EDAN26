@@ -121,7 +121,10 @@ class Vertex(val index: Int, s: Int, val controller: Controller) extends Actor {
         act();
       }
 
-      case Stop()  => { }
+      case Stop()  => {
+          println("stopped this");
+          act();
+       }
     }
   }
 
