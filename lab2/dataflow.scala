@@ -46,10 +46,12 @@ class Controller(val cfg: Array[Vertex]) extends Actor {
       }
       case Changing() =>{
           changeCounter+=1;
+          println(changeCounter);
           act();
       }
       case ChangeDone() =>{
         changeCounter-=1;
+        println(changeCounter);
         if(changeCounter == 0){
           for(actor <- cfg) actor ! new Stop;
           val end = System.currentTimeMillis - begin;
