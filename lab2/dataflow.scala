@@ -60,7 +60,7 @@ class Controller(val cfg: Array[Vertex]) extends Actor {
           var end = System.currentTimeMillis();
           println("T= " + (end - start)/1e9 + " s");
           if(print != 0) {
-            for(i <- 0 until nvertex) cfg(i).print;
+            for(i <- 0 until cfg.length) cfg(i).print;
           }
         } else {
           act();
