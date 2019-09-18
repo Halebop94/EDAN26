@@ -5,10 +5,15 @@ import java.util.BitSet;
 
 case class Start();
 case class Stop();
+case class RequestIn(v: Vertex);
 case class Ready();
 case class Go();
 case class Changing();
 case class Change(in: BitSet);
+<<<<<<< HEAD
+=======
+case class Changing();
+>>>>>>> 2174765ada36460b876306f0b3380ffb3e29305f
 case class ChangeDone();
 
 class Random(seed: Int) {
@@ -28,6 +33,7 @@ class Controller(val cfg: Array[Vertex]) extends Actor {
   var started = 0;
   var changeCounter = 0;
   val begin   = System.currentTimeMillis();
+  var changeCounter = 0;
 
   // LAB 2: The controller must figure out when
   //        to terminate all actors somehow.
@@ -82,6 +88,32 @@ class Vertex(val index: Int, s: Int, val controller: Controller) extends Actor {
         //println("started " + index);
         act();
       }
+      case RequestIn(v:Vertex) => {
+          v ! new Change(in);
+          act();
+      }
+      case Change(otherIn) => {
+        out.or(otherIn);
+        sucCount+=1;
+
+        if(sucCount==succ.length){
+          val old = in;
+          in = new BitSet(s);
+          in.or(out);
+          in.andNot(defs);
+			    in.or(uses);
+
+          if(!in.equals(old)){
+              for(vertex <- pred) {vertex ! new Go;}
+          }
+          else{
+            controller ! new ChangeDone;
+          }
+
+        }
+        act();
+
+      }
 
       case RequestIn(v: Vertex) => {
         v ! new Change(in);
@@ -111,13 +143,21 @@ class Vertex(val index: Int, s: Int, val controller: Controller) extends Actor {
       }
 
       case Go() => {
+<<<<<<< HEAD
+=======
+        // LAB 2: Start working with this vertex.
+        sucCount = 0;
+>>>>>>> 2174765ada36460b876306f0b3380ffb3e29305f
         controller ! new Changing;
         for (vertex <- succ) vertex ! new RequestIn(this);
 
         act();
       }
 
-      case Stop()  => { }
+      case Stop()  => {
+          println("stopped this");
+          act();
+       }
     }
   }
 
