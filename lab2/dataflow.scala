@@ -99,7 +99,7 @@ class Vertex(val index: Int, s: Int, val controller: Controller) extends Actor {
 			    in.or(use);
 
           if(!in.equals(old){
-              for(vertex <- pred) vertex ! new Go;
+              for(vertex <- pred) {vertex ! new Go;}
           }
           else{
             controller ! new ChangeDone;
