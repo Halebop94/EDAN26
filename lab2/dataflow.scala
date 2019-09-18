@@ -7,7 +7,9 @@ case class Start();
 case class Stop();
 case class Ready();
 case class Go();
+case class Changing();
 case class Change(in: BitSet);
+case class ChangeDone();
 
 class Random(seed: Int) {
         var w = seed + 1;
@@ -24,6 +26,7 @@ class Random(seed: Int) {
 
 class Controller(val cfg: Array[Vertex]) extends Actor {
   var started = 0;
+  var changeCounter = 0;
   val begin   = System.currentTimeMillis();
 
   // LAB 2: The controller must figure out when
@@ -40,13 +43,26 @@ class Controller(val cfg: Array[Vertex]) extends Actor {
         }
         act();
       }
+      case Changing() => {
+        changeCounter += 1;
+        act();
+      }
+      case ChangeDone() => {
+        changeCounter -= 1;
+        if(changeCounter == 0) {
+          for(actor <- cfg) actor ! new Stop();
+        }
+        val end = System.currentTimeMillis();
+        println("T= " + end - start + "s");
+      }
     }
-  }
+  } //skickar stop vid något tillfälle
 }
 
 class Vertex(val index: Int, s: Int, val controller: Controller) extends Actor {
   var pred: List[Vertex] = List();
   var succ: List[Vertex] = List();
+  var sucCount = 0;
   val uses               = new BitSet(s);
   val defs               = new BitSet(s);
   var in                 = new BitSet(s);
@@ -67,8 +83,37 @@ class Vertex(val index: Int, s: Int, val controller: Controller) extends Actor {
         act();
       }
 
+      case RequestIn(v: Vertex) => {
+        v ! new Change(in);
+
+        act();
+      }
+
+      case Change(in) {
+        out.or(in);
+        succCount += 1;
+
+        if(sucCount == succ.length){
+          var old = in;
+          in = new BitSet(s);
+          in.or(out);
+          in.andNot(def);
+          in.or(use);
+
+          if(!in.equals(old)) {
+            sucCount = 0;
+            for(vertex <- pred) vertex ! new Go;
+          } else {
+            controller ! new ChangeDone;
+          }
+        }
+        act();
+      }
+
       case Go() => {
-        // LAB 2: Start working with this vertex.
+        controller ! new Changing;
+        for (vertex <- succ) vertex ! new RequestIn(this);
+
         act();
       }
 
