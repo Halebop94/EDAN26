@@ -28,10 +28,10 @@ class Random(seed: Int) {
 class Controller(val cfg: Array[Vertex], val print : Int) extends Actor {
   var started = 0;
   var changeCounter = 0;
-  var begin   = System.currentTimeMillis();
+  var begin   = System.nanoTime();
 
   def startTime() {
-    begin = System.currentTimeMillis();
+    begin = System.nanoTime();
   }
 
   // LAB 2: The controller must figure out when
@@ -57,7 +57,7 @@ class Controller(val cfg: Array[Vertex], val print : Int) extends Actor {
         changeCounter -= 1;
         if(changeCounter == 0) {
           for(actor <- cfg) actor ! new Stop();
-          var end = System.currentTimeMillis();
+          var end = System.nanoTime();
           System.out.println("T = " + (end-begin)/1e9 + " s");
           if(print != 0) {
             for(i <- 0 until cfg.length) cfg(i).print;
