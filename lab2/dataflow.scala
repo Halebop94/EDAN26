@@ -88,8 +88,8 @@ class Vertex(val index: Int, s: Int, val controller: Controller) extends Actor {
           v ! new Change(in);
           act();
       }
-      case Change(in) => {
-        out.or(in);
+      case Change(otherIn) => {
+        out.or(otherIn);
         sucCount+=1;
 
         if(sucCount==succ.length){
