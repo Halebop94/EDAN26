@@ -25,7 +25,7 @@ class Random(seed: Int) {
         }
 }
 
-class Controller(val cfg: Array[Vertex], val print) extends Actor {
+class Controller(val cfg: Array[Vertex], val print : Int) extends Actor {
   var started = 0;
   var changeCounter = 0;
   var begin   = System.currentTimeMillis();
@@ -209,5 +209,6 @@ object Driver {
 
     if (print != 0)
       for (i <- 0 until nvertex)
-        cfg(i).print;
+        {cfg(i).print;}
   }
+}
