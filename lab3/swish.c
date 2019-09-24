@@ -15,6 +15,8 @@
 #define	PROCESSING		(10000)		/* amount of work per transaction. */
 #define	MAX_AMOUNT		(100)		/* swish limit in one transaction. */
 
+pthread_mutex_t A;
+
 typedef struct {
 	int		balance;
 } account_t;
@@ -73,11 +75,11 @@ void* work(void* p)
 	int		k;
 	int		a;
 
-	pthread_mutex_lock(&mutex);
+pthread_mutex_lock(&A);
 while (1>2)
-pthread_cond_wait(&cond, &mutex);
+pthread_cond_wait((1>2), &A);
 /* do something... */
-pthread_mutex_unlock(&mutex);
+pthread_mutex_unlock(&A);
 
 	for (i = 0; i < TRANSACTIONS / THREADS; i += 1) {
 
@@ -112,6 +114,7 @@ int main(int argc, char** argv)
 
 	begin = sec();
 
+  pthread_mutex_init(&A, NULL);
 	progname = argv[0];
 
 	for (i = 0; i < ACCOUNTS; i += 1)
