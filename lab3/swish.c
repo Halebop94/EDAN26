@@ -127,11 +127,11 @@ int main(int argc, char** argv)
 	for (i = 0; i < ACCOUNTS; i += 1)
 		account[i].balance = START_BALANCE;
 
-int i = 0;
-while(i<THREADS){
+		int th = 0;
+while(th<THREADS){
 	 // args to work.
 	status = pthread_create(tid[i], NULL, work, NULL);
-	i++;
+	th++;
 }
 
 	  work(NULL);
