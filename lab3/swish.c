@@ -131,7 +131,12 @@ int status;
 		int th = 0;
 while(th<THREADS){
 	 // args to work.
-	status = pthread_create(&(tid[th]), NULL, work, NULL);
+	 int n = 1;
+	 int a = 2;
+	 int b = 3;
+	 int c = 4;
+	 arg_struct_t arg_struct = { n, a, b, c };
+	status = pthread_create(&(tid[th]), NULL, work,  &arg_struct);
 	th++;
 }
 
