@@ -11,12 +11,14 @@
 #define	START_BALANCE		(1000)		/* initial amount in each account. */
 #define	ACCOUNTS		(1000)		/* number of accounts. */
 #define	TRANSACTIONS		(100000)	/* number of swish transaction to do. */
-#define	THREADS			(1)		/* number of threads. */
+#define	THREADS			(2)		/* number of threads. */
 #define	PROCESSING		(10000)		/* amount of work per transaction. */
 #define	MAX_AMOUNT		(100)		/* swish limit in one transaction. */
 
-pthread_mutex_t A;
-pthread_cond_t C = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t fromLock;
+pthread_mutex_t toLock;
+
+pthread_t tid[THREADS];
 
 typedef struct {
 	int		balance;
@@ -59,13 +61,19 @@ void extra_processing()
 
 void swish(account_t* from, account_t* to, int amount)
 {
-
+	pthread_mutex_lock(&fromLock);
 	if (from->balance - amount >= 0) {
 
 		extra_processing();
 
+		pthread_mutex_lock(&toLock);
 		from->balance -= amount;
 		to->balance += amount;
+
+		pthread_mutex_unlock(&toLock);
+		pthread_mutex_unlock(&fromLock);
+
+
 	}
 }
 
@@ -76,11 +84,6 @@ void* work(void* p)
 	int		k;
 	int		a;
 
-pthread_mutex_lock(&A);
-while (1>2)
-pthread_cond_wait(&C, &A);
-/* do something... */
-pthread_mutex_unlock(&A);
 
 	for (i = 0; i < TRANSACTIONS / THREADS; i += 1) {
 
@@ -91,11 +94,13 @@ pthread_mutex_unlock(&A);
 			k = rand() % ACCOUNTS;
 		while (k == j);
 
+
 		swish(&account[j], &account[k], a);
 	}
 
 	return NULL;
 }
+
 
 int main(int argc, char** argv)
 {
@@ -114,14 +119,22 @@ int main(int argc, char** argv)
 	printf("\n");
 
 	begin = sec();
+  pthread_mutex_init(&fromLock, NULL);
+	pthread_mutex_init(&toLock, NULL);
 
-  pthread_mutex_init(&A, NULL);
 	progname = argv[0];
 
 	for (i = 0; i < ACCOUNTS; i += 1)
 		account[i].balance = START_BALANCE;
 
-	work(NULL);
+int i = 0;
+while(i<THREADS){
+	arg_struct_t arg_struct = { n, a, b, c }; // args to work.
+	status = pthread_create(tid[i], NULL, work, &arg_struct);
+	i++;
+}
+
+	  work(NULL);
 
 	total = 0;
 
