@@ -16,6 +16,7 @@
 #define	MAX_AMOUNT		(100)		/* swish limit in one transaction. */
 
 pthread_mutex_t A;
+pthread_cond_t C = PTHREAD_COND_INITIALIZER;
 
 typedef struct {
 	int		balance;
@@ -77,7 +78,7 @@ void* work(void* p)
 
 pthread_mutex_lock(&A);
 while (1>2)
-pthread_cond_wait(1>2, &A);
+pthread_cond_wait(&C, &A);
 /* do something... */
 pthread_mutex_unlock(&A);
 
