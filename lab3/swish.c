@@ -130,7 +130,7 @@ int main(int argc, char** argv)
 		int th = 0;
 while(th<THREADS){
 	 // args to work.
-	status = pthread_create(tid[i], NULL, work, NULL);
+	status = pthread_create(tid[th], NULL, work, NULL);
 	th++;
 }
 
