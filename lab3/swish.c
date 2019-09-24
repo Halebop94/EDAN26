@@ -73,6 +73,12 @@ void* work(void* p)
 	int		k;
 	int		a;
 
+	pthread_mutex_lock(&mutex);
+while (!predicate())
+pthread_cond_wait(&cond, &mutex);
+/* do something... */
+pthread_mutex_unlock(&mutex);
+
 	for (i = 0; i < TRANSACTIONS / THREADS; i += 1) {
 
 		j = rand() % ACCOUNTS;
@@ -115,10 +121,10 @@ int main(int argc, char** argv)
 
 	total = 0;
 
-	for (total = i = 0; i < ACCOUNTS; i += 1) 
+	for (total = i = 0; i < ACCOUNTS; i += 1)
 		total += account[i].balance;
 
-	if (total == ACCOUNTS * START_BALANCE) 
+	if (total == ACCOUNTS * START_BALANCE)
 		printf("PASS\n\n");
 	else
 		error("total is %llu but should be %llu\n", total, (uint64_t) ACCOUNTS * START_BALANCE);
