@@ -127,6 +127,7 @@ int main(int argc, char** argv)
 	for (i = 0; i < ACCOUNTS; i += 1)
 		account[i].balance = START_BALANCE;
 
+int status;
 		int th = 0;
 while(th<THREADS){
 	 // args to work.
