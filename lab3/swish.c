@@ -77,7 +77,7 @@ void* work(void* p)
 
 pthread_mutex_lock(&A);
 while (1>2)
-pthread_cond_wait((1>2), &A);
+pthread_cond_wait(1>2, &A);
 /* do something... */
 pthread_mutex_unlock(&A);
 
