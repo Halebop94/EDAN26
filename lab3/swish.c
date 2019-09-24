@@ -129,8 +129,8 @@ int main(int argc, char** argv)
 
 int i = 0;
 while(i<THREADS){
-	arg_struct_t arg_struct = { n, a, b, c }; // args to work.
-	status = pthread_create(tid[i], NULL, work, &arg_struct);
+	 // args to work.
+	status = pthread_create(tid[i], NULL, work, NULL);
 	i++;
 }
 
