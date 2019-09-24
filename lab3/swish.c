@@ -18,7 +18,7 @@
 pthread_mutex_t fromLock;
 pthread_mutex_t toLock;
 
-pthread_t tid[THREADS];
+pthread_t tid[2];
 
 typedef struct {
 	int		balance;
