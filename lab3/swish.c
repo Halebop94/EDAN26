@@ -103,7 +103,7 @@ void* work(void* p)
 
 		swish(&account[j], &account[k], a);
 
-		printf(i," trans done \n");
+		printf(" trans done \n");
 
 	}
 
