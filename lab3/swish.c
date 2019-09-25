@@ -59,8 +59,13 @@ void extra_processing()
 void swish(account_t* from, account_t* to, int amount)
 {
 
-	pthread_mutex_lock(&from -> lock);
-	pthread_mutex_lock(&to -> lock);
+  if(from < to){
+		pthread_mutex_lock(&from -> lock);
+		pthread_mutex_lock(&to -> lock);}
+	else {
+		pthread_mutex_lock(&to -> lock);
+		pthread_mutex_lock(&from -> lock);
+	}
 
 	if (from->balance - amount >= 0) {
 
@@ -69,8 +74,14 @@ void swish(account_t* from, account_t* to, int amount)
 		from->balance -= amount;
 		to->balance += amount;
 	}
-	pthread_mutex_unlock(&to -> lock);
-	pthread_mutex_unlock(&from -> lock);
+
+	if(from < to) {
+		pthread_mutex_unlock(&to -> lock);
+		pthread_mutex_unlock(&from -> lock);
+	}else {
+		pthread_mutex_unlock(&from -> lock);
+		pthread_mutex_unlock(&to -> lock);
+	}
 }
 
 void* work(void* p)
@@ -121,13 +132,11 @@ int main(int argc, char** argv)
 	}
 
 	for(i = 0; i < THREADS; i += 1){
-		pthread_create(&thread[i], NULL, work, (void *)&thread[i]);
+		pthread_create(&thread[i], NULL, work, NULL;
 	}
 
-	void* ret = NULL;
-	
-	for(i = 0; i < 2; i =+ 1){
-		pthread_join(thread[i], (void**)&ret);
+	for(i = 0; i < THREADS; i =+ 1){
+		pthread_join(thread[i], NULL);
 	}
 
 	total = 0;
