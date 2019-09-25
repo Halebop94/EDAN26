@@ -133,7 +133,7 @@ int n = 1;
 while(th<THREADS){
 	 // args to work.
 
-	pthread_create(&(tid[th]), NULL, work,  &n);
+	int pthread_create(&(tid[th]), NULL, work,  &n);
 	th++;
 }
 
