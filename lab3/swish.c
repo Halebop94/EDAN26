@@ -75,12 +75,9 @@ void swish(account_t* from, account_t* to, int amount)
 
 		from->balance -= amount;
 		to->balance += amount;
-
-		pthread_mutex_unlock(&toLock);
-		pthread_mutex_unlock(&fromLock);
-
-
 	}
+	pthread_mutex_unlock(&toLock);
+	pthread_mutex_unlock(&fromLock);
 }
 
 void* work(void* p)
@@ -139,8 +136,14 @@ int main(int argc, char** argv)
 pthread_t tid1;
 pthread_t tid2;
 
+
+void* ret = NULL;
+
 	pthread_create(&tid1, NULL, work,  (void *)&tid1);
 	pthread_create(&tid2, NULL, work,  (void *)&tid2);
+
+	pthread_join(tid1,(void**)&ret);
+	pthread_join(tid2,(void**)&ret);
 
 	total = 0;
 
