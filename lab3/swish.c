@@ -129,15 +129,11 @@ int main(int argc, char** argv)
 
 int status;
 		int th = 0;
-		int n = 1;
-		int a = 2;
-		int b = 3;
-		int c = 4;
-		arg_struct_t arg_struct = { &n, &a, &b, &c };
+
 while(th<THREADS){
 	 // args to work.
 
-	status = pthread_create(&(tid[th]), NULL, work,  &arg_struct);
+	status = pthread_create(&(tid[th]), NULL, work,  &n);
 	th++;
 }
 
