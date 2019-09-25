@@ -129,11 +129,12 @@ int main(int argc, char** argv)
 
 		int th = 0;
 int n = 1;
+int status = 0;
 
 while(th<THREADS){
 	 // args to work.
 
-	int pthread_create(&(tid[th]), NULL, work,  &n);
+	status = pthread_create(&(tid[th]), NULL, work,  &n);
 	th++;
 }
 
