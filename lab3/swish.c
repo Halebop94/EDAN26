@@ -136,8 +136,14 @@ int main(int argc, char** argv)
 pthread_t tid1;
 pthread_t tid2;
 
+
+void* ret = NULL;
+
 	pthread_create(&tid1, NULL, work,  (void *)&tid1);
 	pthread_create(&tid2, NULL, work,  (void *)&tid2);
+
+	pthread_join(&tid1,(void**)&ret);
+	pthread_join(&tid2,(void**)&ret);
 
 	total = 0;
 
