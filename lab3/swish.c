@@ -61,12 +61,18 @@ void extra_processing()
 
 void swish(account_t* from, account_t* to, int amount)
 {
+	printf("trying to take lock");
+
 	pthread_mutex_lock(&fromLock);
+	pthread_mutex_lock(&toLock);
+
+	printf("took lock");
+
+
 	if (from->balance - amount >= 0) {
 
 		extra_processing();
 
-		pthread_mutex_lock(&toLock);
 		from->balance -= amount;
 		to->balance += amount;
 
