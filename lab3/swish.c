@@ -64,7 +64,6 @@ void swish(account_t* from, account_t* to, int amount)
 	printf("trying to take lock \n");
 
 	pthread_mutex_lock(&fromLock);
-	pthread_mutex_lock(&toLock);
 
 	printf("took lock \n");
 
@@ -76,7 +75,6 @@ void swish(account_t* from, account_t* to, int amount)
 		from->balance -= amount;
 		to->balance += amount;
 	}
-	pthread_mutex_unlock(&toLock);
 	pthread_mutex_unlock(&fromLock);
 }
 
