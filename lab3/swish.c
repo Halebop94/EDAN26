@@ -10,9 +10,9 @@
 #define	WIDTH			(14)		/* text width. */
 #define	START_BALANCE		(1000)		/* initial amount in each account. */
 #define	ACCOUNTS		(1000)		/* number of accounts. */
-#define	TRANSACTIONS		(10)	/* number of swish transaction to do. */
+#define	TRANSACTIONS		(100)	/* number of swish transaction to do. */
 #define	THREADS			(2)		/* number of threads. */
-#define	PROCESSING		(100)		/* amount of work per transaction. */
+#define	PROCESSING		(1000)		/* amount of work per transaction. */
 #define	MAX_AMOUNT		(100)		/* swish limit in one transaction. */
 
 pthread_mutex_t fromLock;
