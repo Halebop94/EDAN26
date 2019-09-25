@@ -122,22 +122,22 @@ int main(int argc, char** argv)
   pthread_mutex_init(&fromLock, NULL);
 	pthread_mutex_init(&toLock, NULL);
 
-	int i = 0;
-	int error;
 	progname = argv[0];
 
 	for (i = 0; i < ACCOUNTS; i += 1)
 		account[i].balance = START_BALANCE;
 
-int status;
-		int th = 0;
-while(th<THREADS){
+	int status;
+	int th = 0;
+	int n = 1;
+
+	while(th<THREADS){
 	 // args to work.
-	 int n = 1;
-	 arg_struct_t arg_struct = { n};
-	status = pthread_create(&(tid[th]), NULL, work,  &arg_struct);
-	th++;
-}
+		status = pthread_create(&(tid[th]), NULL, work, &n);
+		if(status != 0)
+			printf("Thread can't be created: [%s]\n", strerror(status));
+		th++;
+	}
 
 	  work(NULL);
 
