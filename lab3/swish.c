@@ -11,8 +11,8 @@
 #define	START_BALANCE		(1000)		/* initial amount in each account. */
 #define	ACCOUNTS		(1000)		/* number of accounts. */
 #define	TRANSACTIONS		(100000)	/* number of swish transaction to do. */
-#define	THREADS			(2)		/* number of threads. */
-#define	PROCESSING		(1000)		/* amount of work per transaction. */
+#define	THREADS			(10)		/* number of threads. */
+#define	PROCESSING		(100000)		/* amount of work per transaction. */
 #define	MAX_AMOUNT		(100)		/* swish limit in one transaction. */
 
 typedef struct {
@@ -60,11 +60,11 @@ void swish(account_t* from, account_t* to, int amount)
 {
 
   if(from < to){
-		pthread_mutex_lock(&from -> lock);
-		pthread_mutex_lock(&to -> lock);}
+		pthread_mutex_lock(&from->lock);
+		pthread_mutex_lock(&to->lock);}
 	else {
-		pthread_mutex_lock(&to -> lock);
-		pthread_mutex_lock(&from -> lock);
+		pthread_mutex_lock(&to->lock);
+		pthread_mutex_lock(&from->lock);
 	}
 
 	if (from->balance - amount >= 0) {
@@ -76,11 +76,11 @@ void swish(account_t* from, account_t* to, int amount)
 	}
 
 	if(from < to) {
-		pthread_mutex_unlock(&to -> lock);
-		pthread_mutex_unlock(&from -> lock);
+		pthread_mutex_unlock(&from->lock);
+		pthread_mutex_unlock(&to->lock);
 	}else {
-		pthread_mutex_unlock(&from -> lock);
-		pthread_mutex_unlock(&to -> lock);
+		pthread_mutex_unlock(&to->lock);
+		pthread_mutex_unlock(&from->lock);
 	}
 }
 
@@ -128,14 +128,14 @@ int main(int argc, char** argv)
 		account[i].balance = START_BALANCE;
 		pthread_mutexattr_init(&account[i].attr);
 		pthread_mutexattr_settype(&account[i].attr, PTHREAD_MUTEX_RECURSIVE);
-		pthread_mutex_init(&account[i].lock,&account[i].attr);
+		pthread_mutex_init(&account[i].lock, &account[i].attr);
 	}
 
 	for(i = 0; i < THREADS; i += 1){
 		pthread_create(&thread[i], NULL, work, NULL);
 	}
 
-	for(i = 0; i < THREADS; i =+ 1){
+	for(i = 0; i < THREADS; i += 1){
 		pthread_join(thread[i], NULL);
 	}
 
