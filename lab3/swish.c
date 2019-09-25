@@ -10,15 +10,13 @@
 #define	WIDTH			(14)		/* text width. */
 #define	START_BALANCE		(1000)		/* initial amount in each account. */
 #define	ACCOUNTS		(1000)		/* number of accounts. */
-#define	TRANSACTIONS		(100)	/* number of swish transaction to do. */
+#define	TRANSACTIONS		(100000)	/* number of swish transaction to do. */
 #define	THREADS			(2)		/* number of threads. */
 #define	PROCESSING		(1000)		/* amount of work per transaction. */
 #define	MAX_AMOUNT		(100)		/* swish limit in one transaction. */
 
 pthread_mutex_t fromLock;
 pthread_mutex_t toLock;
-
-pthread_t tid[2];
 
 typedef struct {
 	int		balance;
@@ -133,17 +131,16 @@ int main(int argc, char** argv)
 	for (i = 0; i < ACCOUNTS; i += 1)
 		account[i].balance = START_BALANCE;
 
-pthread_t tid1;
-pthread_t tid2;
+	for(i = 0; i < THREADS; i += 1){
+		pthread_create(&thread[i], NULL, work, (void *)&thread[i]);
+	}
 
 
 void* ret = NULL;
 
-	pthread_create(&tid1, NULL, work,  (void *)&tid1);
-	pthread_create(&tid2, NULL, work,  (void *)&tid2);
-
-	pthread_join(tid1,(void**)&ret);
-	pthread_join(tid2,(void**)&ret);
+	for(i = 0; i < THREADS; i =+ 1){
+		pthread_join(thread[i], (void**)&ret);
+	}
 
 	total = 0;
 
