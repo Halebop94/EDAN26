@@ -74,8 +74,8 @@ void swish(account_t* from, account_t* to, int amount)
 		from->balance -= amount;
 		to->balance += amount;
 	}
-	pthread_mutex_unlock(&fromLock);
 	pthread_mutex_unlock(&toLock);
+	pthread_mutex_unlock(&fromLock);
 }
 
 void* work(void* p)
