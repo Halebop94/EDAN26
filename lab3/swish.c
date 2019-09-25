@@ -61,12 +61,12 @@ void extra_processing()
 
 void swish(account_t* from, account_t* to, int amount)
 {
-	printf("trying to take lock");
+	printf("trying to take lock" \n);
 
 	pthread_mutex_lock(&fromLock);
 	pthread_mutex_lock(&toLock);
 
-	printf("took lock");
+	printf("took lock" \n);
 
 
 	if (from->balance - amount >= 0) {
@@ -102,6 +102,9 @@ void* work(void* p)
 
 
 		swish(&account[j], &account[k], a);
+
+		printf(i + " trans done " \n);
+
 	}
 
 	return NULL;
