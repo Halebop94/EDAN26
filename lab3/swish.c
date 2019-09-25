@@ -11,13 +11,14 @@
 #define	START_BALANCE		(1000)		/* initial amount in each account. */
 #define	ACCOUNTS		(1000)		/* number of accounts. */
 #define	TRANSACTIONS		(100000)	/* number of swish transaction to do. */
-#define	THREADS			(1)		/* number of threads. */
+#define	THREADS			(2)		/* number of threads. */
 #define	PROCESSING		(10000)		/* amount of work per transaction. */
 #define	MAX_AMOUNT		(100)		/* swish limit in one transaction. */
 
-pthread_t tid[THREADS]
-pthread_mutex_lock fromLock;
-pthread_mutex_lock toLock;
+pthread_mutex_t fromLock;
+pthread_mutex_t toLock;
+
+pthread_t tid[2];
 
 typedef struct {
 	int		balance;
@@ -60,13 +61,19 @@ void extra_processing()
 
 void swish(account_t* from, account_t* to, int amount)
 {
-	pthread_mutex_lock(&lock);
+	pthread_mutex_lock(&fromLock);
 	if (from->balance - amount >= 0) {
 
 		extra_processing();
 
+		pthread_mutex_lock(&toLock);
 		from->balance -= amount;
 		to->balance += amount;
+
+		pthread_mutex_unlock(&toLock);
+		pthread_mutex_unlock(&fromLock);
+
+
 	}
 }
 
@@ -77,6 +84,7 @@ void* work(void* p)
 	int		k;
 	int		a;
 
+
 	for (i = 0; i < TRANSACTIONS / THREADS; i += 1) {
 
 		j = rand() % ACCOUNTS;
@@ -86,11 +94,13 @@ void* work(void* p)
 			k = rand() % ACCOUNTS;
 		while (k == j);
 
+
 		swish(&account[j], &account[k], a);
 	}
 
 	return NULL;
 }
+
 
 int main(int argc, char** argv)
 {
@@ -109,7 +119,7 @@ int main(int argc, char** argv)
 	printf("\n");
 
 	begin = sec();
-	pthread_mutex_init(&fromLock, NULL);
+  pthread_mutex_init(&fromLock, NULL);
 	pthread_mutex_init(&toLock, NULL);
 
 	int i = 0;
@@ -119,12 +129,20 @@ int main(int argc, char** argv)
 	for (i = 0; i < ACCOUNTS; i += 1)
 		account[i].balance = START_BALANCE;
 
-	while(i< THREADS){
-		error = pthread_create(&(tid[i]), NULL, work, NULL);
-		if(error != 0)
-			printf("hej hej\n");
-		i++;
-	}
+int status;
+		int th = 0;
+while(th<THREADS){
+	 // args to work.
+	 int n = 1;
+	 int a = 2;
+	 int b = 3;
+	 int c = 4;
+	 arg_struct_t arg_struct = { n, a, b, c };
+	status = pthread_create(&(tid[th]), NULL, work,  &arg_struct);
+	th++;
+}
+
+	  work(NULL);
 
 	total = 0;
 
