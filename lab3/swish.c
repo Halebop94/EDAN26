@@ -129,6 +129,7 @@ int main(int argc, char** argv)
 
 int status;
 		int th = 0;
+int n = 1;
 
 while(th<THREADS){
 	 // args to work.
