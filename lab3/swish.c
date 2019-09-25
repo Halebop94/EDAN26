@@ -132,7 +132,7 @@ int main(int argc, char** argv)
 	}
 
 	for(i = 0; i < THREADS; i += 1){
-		pthread_create(&thread[i], NULL, work, NULL;
+		pthread_create(&thread[i], NULL, work, NULL);
 	}
 
 	for(i = 0; i < THREADS; i =+ 1){
