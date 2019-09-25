@@ -137,8 +137,8 @@ int main(int argc, char** argv)
 	printf("Hej hej hallå\n");
 
 	void* ret = NULL;
-
-	for(i = 0; i < THREADS; i =+ 1){
+	printf("%d\n", THREADS);
+	for(i = 0; i < 2; i =+ 1){
 		printf("joining threads\n");
 		pthread_join(thread[i], (void**)&ret);
 	}
