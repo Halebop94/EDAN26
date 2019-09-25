@@ -15,6 +15,10 @@
 #define	PROCESSING		(10000)		/* amount of work per transaction. */
 #define	MAX_AMOUNT		(100)		/* swish limit in one transaction. */
 
+pthread_t tid[THREADS]
+pthread_mutex_lock fromLock;
+pthread_mutex_lock toLock;
+
 typedef struct {
 	int		balance;
 } account_t;
@@ -56,7 +60,7 @@ void extra_processing()
 
 void swish(account_t* from, account_t* to, int amount)
 {
-
+	pthread_mutex_lock(&lock);
 	if (from->balance - amount >= 0) {
 
 		extra_processing();
@@ -105,20 +109,29 @@ int main(int argc, char** argv)
 	printf("\n");
 
 	begin = sec();
+	pthread_mutex_init(&fromLock, NULL);
+	pthread_mutex_init(&toLock, NULL);
 
+	int i = 0;
+	int error;
 	progname = argv[0];
 
 	for (i = 0; i < ACCOUNTS; i += 1)
 		account[i].balance = START_BALANCE;
 
-	work(NULL);
+	while(i< THREADS){
+		error = pthread_create(&(tid[i]), NULL, work, NULL);
+		if(error != 0)
+			printf("hej hej\n");
+		i++;
+	}
 
 	total = 0;
 
-	for (total = i = 0; i < ACCOUNTS; i += 1) 
+	for (total = i = 0; i < ACCOUNTS; i += 1)
 		total += account[i].balance;
 
-	if (total == ACCOUNTS * START_BALANCE) 
+	if (total == ACCOUNTS * START_BALANCE)
 		printf("PASS\n\n");
 	else
 		error("total is %llu but should be %llu\n", total, (uint64_t) ACCOUNTS * START_BALANCE);
