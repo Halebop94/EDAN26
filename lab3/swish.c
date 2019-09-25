@@ -133,9 +133,6 @@ pthread_t tid2;
 	pthread_create(&tid1, NULL, work,  (void *)&tid1);
 	pthread_create(&tid2, NULL, work,  (void *)&tid2);
 
-
-}
-
 	  work(NULL);
 
 	total = 0;
