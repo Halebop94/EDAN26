@@ -134,11 +134,12 @@ int main(int argc, char** argv)
 	for(i = 0; i < THREADS; i += 1){
 		pthread_create(&thread[i], NULL, work, (void *)&thread[i]);
 	}
+	printf("Hej hej hallå\n");
 
-
-void* ret = NULL;
+	void* ret = NULL;
 
 	for(i = 0; i < THREADS; i =+ 1){
+		printf("joining threads\n");
 		pthread_join(thread[i], (void**)&ret);
 	}
 
