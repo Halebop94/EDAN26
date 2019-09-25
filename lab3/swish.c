@@ -101,7 +101,7 @@ void* work(void* p)
 		printf(" trans done \n");
 
 	}
-
+	printf("work done\n");
 	return NULL;
 }
 
