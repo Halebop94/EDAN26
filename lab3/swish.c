@@ -15,11 +15,10 @@
 #define	PROCESSING		(1000)		/* amount of work per transaction. */
 #define	MAX_AMOUNT		(100)		/* swish limit in one transaction. */
 
-pthread_mutex_t fromLock;
-pthread_mutex_t toLock;
-
 typedef struct {
 	int		balance;
+	pthread_mutex_t lock;
+	pthread_mutexattr_t attr;
 } account_t;
 
 account_t		account[ACCOUNTS];
@@ -59,13 +58,9 @@ void extra_processing()
 
 void swish(account_t* from, account_t* to, int amount)
 {
-	printf("trying to take lock \n");
 
-	pthread_mutex_lock(&fromLock);
-	pthread_mutex_lock(&toLock);
-
-	printf("took lock \n");
-
+	pthread_mutex_lock(&from -> lock);
+	pthread_mutex_lock(&to -> lock);
 
 	if (from->balance - amount >= 0) {
 
@@ -74,8 +69,8 @@ void swish(account_t* from, account_t* to, int amount)
 		from->balance -= amount;
 		to->balance += amount;
 	}
-	pthread_mutex_unlock(&toLock);
-	pthread_mutex_unlock(&fromLock);
+	pthread_mutex_unlock(&to -> lock);
+	pthread_mutex_unlock(&from -> lock);
 }
 
 void* work(void* p)
@@ -90,18 +85,10 @@ void* work(void* p)
 
 		j = rand() % ACCOUNTS;
 		a = rand() % MAX_AMOUNT;
-
-		do
-			k = rand() % ACCOUNTS;
-		while (k == j);
-
-
+		k = rand() % ACCOUNTS;
 		swish(&account[j], &account[k], a);
 
-		printf(" trans done \n");
-
 	}
-	printf("work done\n");
 	return NULL;
 }
 
@@ -123,23 +110,23 @@ int main(int argc, char** argv)
 	printf("\n");
 
 	begin = sec();
-  pthread_mutex_init(&fromLock, NULL);
-	pthread_mutex_init(&toLock, NULL);
 
 	progname = argv[0];
 
-	for (i = 0; i < ACCOUNTS; i += 1)
+	for (i = 0; i < ACCOUNTS; i += 1){
 		account[i].balance = START_BALANCE;
+		pthread_mutexattr_init(&account[i].attr);
+		pthread_mutexattr_settype(&account[i].attr, PTHREAD_MUTEX_RECURSIVE);
+		pthread_mutex_init(&account[i].lock,&account[i].attr);
+	}
 
 	for(i = 0; i < THREADS; i += 1){
 		pthread_create(&thread[i], NULL, work, (void *)&thread[i]);
 	}
-	printf("Hej hej hallå\n");
 
 	void* ret = NULL;
-	printf("%d\n", THREADS);
+	
 	for(i = 0; i < 2; i =+ 1){
-		printf("joining threads\n");
 		pthread_join(thread[i], (void**)&ret);
 	}
 
