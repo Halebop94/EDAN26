@@ -10,9 +10,9 @@
 #define	WIDTH			(14)		/* text width. */
 #define	START_BALANCE		(1000)		/* initial amount in each account. */
 #define	ACCOUNTS		(1000)		/* number of accounts. */
-#define	TRANSACTIONS		(100000)	/* number of swish transaction to do. */
+#define	TRANSACTIONS		(100)	/* number of swish transaction to do. */
 #define	THREADS			(2)		/* number of threads. */
-#define	PROCESSING		(10000)		/* amount of work per transaction. */
+#define	PROCESSING		(1000)		/* amount of work per transaction. */
 #define	MAX_AMOUNT		(100)		/* swish limit in one transaction. */
 
 pthread_mutex_t fromLock;
@@ -61,12 +61,18 @@ void extra_processing()
 
 void swish(account_t* from, account_t* to, int amount)
 {
+	printf("trying to take lock \n");
+
 	pthread_mutex_lock(&fromLock);
+	pthread_mutex_lock(&toLock);
+
+	printf("took lock \n");
+
+
 	if (from->balance - amount >= 0) {
 
 		extra_processing();
 
-		pthread_mutex_lock(&toLock);
 		from->balance -= amount;
 		to->balance += amount;
 
@@ -96,6 +102,9 @@ void* work(void* p)
 
 
 		swish(&account[j], &account[k], a);
+
+		printf(" trans done \n");
+
 	}
 
 	return NULL;
