@@ -11,7 +11,8 @@
 
 typedef struct vertex_t	vertex_t;
 typedef struct task_t	task_t;
-
+pthread_mutex_t lock;
+ 
 /* cfg_t: a control flow graph. */
 struct cfg_t {
 	size_t			nvertex;	/* number of vertices		*/
@@ -126,13 +127,24 @@ void liveness(cfg_t* cfg)
 	list_t*		h;
 
 	worklist = NULL;
-
+	pthread_mutex_init(&lock, NULL);
+	
 	for (i = 0; i < cfg->nvertex; ++i) {
 		u = &cfg->vertex[i];
 
 		insert_last(&worklist, u);
 		u->listed = true;
 	}
+
+
+	for(i = 0; i < 4; i += 1){
+		pthread_create(&thread[i], NULL, work, NULL);
+	}
+
+	for(i = 0; i < 4; i += 1){
+		pthread_join(thread[i], NULL);
+	}
+
 
 	while ((u = remove_first(&worklist)) != NULL) {
 		u->listed = false;
@@ -163,6 +175,16 @@ void liveness(cfg_t* cfg)
 			} while (p != h);
 		}
 	}
+}
+
+void* work(void* p)
+{
+	pthread_mutex_lock(&lock);
+
+
+
+	pthread_mutex_unlock(&lock);
+	return NULL;
 }
 
 void print_sets(cfg_t* cfg, FILE *fp)
