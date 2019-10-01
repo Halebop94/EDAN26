@@ -28,6 +28,7 @@ struct vertex_t {
 	size_t			nsucc;		/* number of successor vertices */
 	vertex_t**		succ;		/* successor vertices 		*/
 	list_t*			pred;		/* predecessor vertices		*/
+	pthread_mutex_t mutex;
 	bool			listed;		/* on worklist			*/
 };
 
@@ -73,6 +74,7 @@ static void init_vertex(vertex_t* v, size_t index, size_t nsymbol, size_t max_su
 
 	v->index	= index;
 	v->succ		= calloc(max_succ, sizeof(vertex_t*));
+	v -> mutex =  pthread_mutex_lock(&lock);
 
 	if (v->succ == NULL)
 		error("out of memory");
@@ -115,6 +117,68 @@ void setbit(cfg_t* cfg, size_t v, set_type_t type, size_t index)
 	set(cfg->vertex[v].set[type], index);
 }
 
+vertex_t* take_first_sync(list_t list){
+	vertex_t* u = NULL;
+	pthread_mutex_lock(&lock);
+	u = remove_first(&list);
+	pthread_mutex_unlock(&lock);
+	return u;
+}
+
+void* work(void* p)
+{
+		list_t** worklist = (list_t**)p;
+		vertex_t*	u;
+		vertex_t*	v;
+		set_t*		prev;
+		size_t		i;
+		size_t		j;
+		list_t*		p;
+		list_t*		h;
+
+
+		while ((u = take_first_sync(worklist) != NULL) {
+		pthread_mutex_lock(u->mutex);
+		u->listed = false;
+		reset(u->set[OUT]);
+		pthread_mutex_unlock(u->mutex);
+
+		for (j = 0; j < u->nsucc; ++j){
+			pthread_mutex_lock(u->succ[j]->mutex);
+			or(u->set[OUT], u->set[OUT], u->succ[j]->set[IN]);
+			pthread_mutex_unlock(u->succ[j]->mutex);
+		}
+			
+		pthread_mutex_lock(u-> mutex);
+		prev = u->prev;
+		u->prev = u->set[IN];
+		u->set[IN] = prev;
+		/* in our case liveness information... */
+		propagate(u->set[IN], u->set[OUT], u->set[DEF], u->set[USE]);
+		pthread_mutex_unlock(u-> mutex);
+
+		if (u->pred != NULL && !equal(u->prev, u->set[IN])) {
+			p = h = u->pred;
+			do {
+				v = p->data;
+				pthread_mutex_lock(v->mutex);
+				if (!v->listed) {
+					v->listed = true;
+					pthread_mutex_lock(&lock);
+					insert_last(worklist, v);
+					pthread_mutex_unlock(&lock);
+
+				}
+				pthread_mutex_unlock(v->mutex);
+
+				p = p->succ;
+
+				} while (p != h);
+			}
+		}
+	return NULL;
+}
+
 void liveness(cfg_t* cfg)
 {
 	vertex_t*	u;
@@ -126,11 +190,14 @@ void liveness(cfg_t* cfg)
 	list_t*		p;
 	list_t*		h;
 
+	pthread_t	thread[4];
 	worklist = NULL;
 	pthread_mutex_init(&lock, NULL);
+
 	
 	for (i = 0; i < cfg->nvertex; ++i) {
 		u = &cfg->vertex[i];
+		pthread_mutex_init(&u->lock, NULL);
 
 		insert_last(&worklist, u);
 		u->listed = true;
@@ -138,54 +205,15 @@ void liveness(cfg_t* cfg)
 
 
 	for(i = 0; i < 4; i += 1){
-		pthread_create(&thread[i], NULL, work, NULL);
+		pthread_create(&thread[i], NULL, work, &worklist);
 	}
 
 	for(i = 0; i < 4; i += 1){
 		pthread_join(thread[i], NULL);
 	}
 
-
-	while ((u = remove_first(&worklist)) != NULL) {
-		u->listed = false;
-
-		reset(u->set[OUT]);
-
-		for (j = 0; j < u->nsucc; ++j)
-			or(u->set[OUT], u->set[OUT], u->succ[j]->set[IN]);
-
-		prev = u->prev;
-		u->prev = u->set[IN];
-		u->set[IN] = prev;
-
-		/* in our case liveness information... */
-		propagate(u->set[IN], u->set[OUT], u->set[DEF], u->set[USE]);
-
-		if (u->pred != NULL && !equal(u->prev, u->set[IN])) {
-			p = h = u->pred;
-			do {
-				v = p->data;
-				if (!v->listed) {
-					v->listed = true;
-					insert_last(&worklist, v);
-				}
-
-				p = p->succ;
-
-			} while (p != h);
-		}
-	}
 }
 
-void* work(void* p)
-{
-	pthread_mutex_lock(&lock);
-
-
-
-	pthread_mutex_unlock(&lock);
-	return NULL;
-}
 
 void print_sets(cfg_t* cfg, FILE *fp)
 {
