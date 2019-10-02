@@ -9,19 +9,16 @@
 
 #define	WIDTH			(14)		/* text width. */
 #define	START_BALANCE		(1000)		/* initial amount in each account. */
-#define	ACCOUNTS		(10)		/* number of accounts. */
+#define	ACCOUNTS		(1000)		/* number of accounts. */
 #define	TRANSACTIONS		(100000)	/* number of swish transaction to do. */
-<<<<<<< Updated upstream
 #define	THREADS			(128)		/* number of threads. */
 #define	PROCESSING		(1000000)		/* amount of work per transaction. */
-=======
-#define	THREADS			(1)		/* number of threads. */
-#define	PROCESSING		(100)		/* amount of work per transaction. */
->>>>>>> Stashed changes
 #define	MAX_AMOUNT		(100)		/* swish limit in one transaction. */
 
 typedef struct {
 	int		balance;
+	pthread_mutex_t lock;
+	pthread_mutexattr_t attr;
 } account_t;
 
 account_t		account[ACCOUNTS];
@@ -62,12 +59,28 @@ void extra_processing()
 void swish(account_t* from, account_t* to, int amount)
 {
 
+  if(from < to){
+		pthread_mutex_lock(&from->lock);
+		pthread_mutex_lock(&to->lock);}
+	else {
+		pthread_mutex_lock(&to->lock);
+		pthread_mutex_lock(&from->lock);
+	}
+
 	if (from->balance - amount >= 0) {
 
 		extra_processing();
 
 		from->balance -= amount;
 		to->balance += amount;
+	}
+
+	if(from < to) {
+		pthread_mutex_unlock(&from->lock);
+		pthread_mutex_unlock(&to->lock);
+	}else {
+		pthread_mutex_unlock(&to->lock);
+		pthread_mutex_unlock(&from->lock);
 	}
 }
 
@@ -78,20 +91,18 @@ void* work(void* p)
 	int		k;
 	int		a;
 
+
 	for (i = 0; i < TRANSACTIONS / THREADS; i += 1) {
 
 		j = rand() % ACCOUNTS;
 		a = rand() % MAX_AMOUNT;
-
-		do
-			k = rand() % ACCOUNTS;
-		while (k == j);
-
+		k = rand() % ACCOUNTS;
 		swish(&account[j], &account[k], a);
-	}
 
+	}
 	return NULL;
 }
+
 
 int main(int argc, char** argv)
 {
@@ -113,10 +124,20 @@ int main(int argc, char** argv)
 
 	progname = argv[0];
 
-	for (i = 0; i < ACCOUNTS; i += 1)
+	for (i = 0; i < ACCOUNTS; i += 1){
 		account[i].balance = START_BALANCE;
+		pthread_mutexattr_init(&account[i].attr);
+		pthread_mutexattr_settype(&account[i].attr, PTHREAD_MUTEX_RECURSIVE);
+		pthread_mutex_init(&account[i].lock, &account[i].attr);
+	}
 
-	work(NULL);
+	for(i = 0; i < THREADS; i += 1){
+		pthread_create(&thread[i], NULL, work, NULL);
+	}
+
+	for(i = 0; i < THREADS; i += 1){
+		pthread_join(thread[i], NULL);
+	}
 
 	total = 0;
 
