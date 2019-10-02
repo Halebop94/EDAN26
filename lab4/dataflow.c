@@ -191,7 +191,7 @@ void liveness(cfg_t* cfg)
 	pthread_mutex_init(&lock, NULL);
 
 	
-	for (i = 0; i < cfg->nvertex; ++i) {
+	for (int i = 0; i < cfg->nvertex; ++i) {
 		u = &cfg->vertex[i];
 		pthread_mutex_init(&u->lock, NULL);
 
