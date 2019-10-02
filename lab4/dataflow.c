@@ -118,7 +118,7 @@ void setbit(cfg_t* cfg, size_t v, set_type_t type, size_t index)
 	set(cfg->vertex[v].set[type], index);
 }
 
-vertex_t* take_first_sync(list_t list){
+vertex_t* take_first_sync(list_t** list){
 	vertex_t* u = NULL;
 	pthread_mutex_lock(&lock);
 	u = remove_first(list);
