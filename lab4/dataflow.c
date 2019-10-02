@@ -193,18 +193,17 @@ void liveness(cfg_t* cfg)
 	
 	for (int i = 0; i < cfg->nvertex; ++i) {
 		u = &cfg->vertex[i];
-		pthread_mutex_init(&u->lock, NULL);
 
 		insert_last(&worklist, u);
 		u->listed = true;
 	}
 
 
-	for(i = 0; i < 4; i += 1){
+	for(int i = 0; i < 4; i += 1){
 		pthread_create(&thread[i], NULL, work, &worklist);
 	}
 
-	for(i = 0; i < 4; i += 1){
+	for(int i = 0; i < 4; i += 1){
 		pthread_join(thread[i], NULL);
 	}
 
