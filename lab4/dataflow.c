@@ -74,7 +74,7 @@ static void init_vertex(vertex_t* v, size_t index, size_t nsymbol, size_t max_su
 
 	v->index	= index;
 	v->succ		= calloc(max_succ, sizeof(vertex_t*));
-	v -> mutex =  pthread_mutex_lock(&lock);
+	v->mutex = pthread_mutex_lock(&lock);
 
 	if (v->succ == NULL)
 		error("out of memory");
@@ -149,13 +149,13 @@ void* work(void* list_in)
 			pthread_mutex_unlock(u->succ[j]->mutex);
 		}
 			
-		pthread_mutex_lock(u-> mutex);
+		pthread_mutex_lock(u->mutex);
 		prev = u->prev;
 		u->prev = u->set[IN];
 		u->set[IN] = prev;
 		/* in our case liveness information... */
 		propagate(u->set[IN], u->set[OUT], u->set[DEF], u->set[USE]);
-		pthread_mutex_unlock(u-> mutex);
+		pthread_mutex_unlock(u->mutex);
 
 		if (u->pred != NULL && !equal(u->prev, u->set[IN])) {
 			p = h = u->pred;
