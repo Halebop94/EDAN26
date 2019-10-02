@@ -137,7 +137,7 @@ void* work(void* p)
 		list_t*		h;
 
 
-		while ((u = take_first_sync(worklist) != NULL) {
+		while ((u = take_first_sync(worklist)) != NULL) {
 		pthread_mutex_lock(u->mutex);
 		u->listed = false;
 		reset(u->set[OUT]);
@@ -182,13 +182,8 @@ void* work(void* p)
 void liveness(cfg_t* cfg)
 {
 	vertex_t*	u;
-	vertex_t*	v;
-	set_t*		prev;
-	size_t		i;
-	size_t		j;
 	list_t*		worklist;
-	list_t*		p;
-	list_t*		h;
+	
 
 	pthread_t	thread[4];
 	worklist = NULL;
