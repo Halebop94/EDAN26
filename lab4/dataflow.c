@@ -12,7 +12,7 @@
 typedef struct vertex_t	vertex_t;
 typedef struct task_t	task_t;
 pthread_mutex_t lock;
- 
+
 /* cfg_t: a control flow graph. */
 struct cfg_t {
 	size_t			nvertex;	/* number of vertices		*/
@@ -79,7 +79,7 @@ static void init_vertex(vertex_t* v, size_t index, size_t nsymbol, size_t max_su
 
 	if (v->succ == NULL)
 		error("out of memory");
-	
+
 	for (i = 0; i < NSETS; i += 1)
 		v->set[i] = new_set(nsymbol);
 
@@ -149,7 +149,7 @@ void* work(void* list_in)
 			or(u->set[OUT], u->set[OUT], u->succ[j]->set[IN]);
 			pthread_mutex_unlock(&u->succ[j]->mutex);
 		}
-			
+
 		pthread_mutex_lock(&u->mutex);
 		prev = u->prev;
 		u->prev = u->set[IN];
@@ -165,14 +165,13 @@ void* work(void* list_in)
 				pthread_mutex_lock(&v->mutex);
 				if (!v->listed) {
 					v->listed = true;
+          pthread_mutex_unlock(&v->mutex);
 					pthread_mutex_lock(&lock);
 					insert_last(worklist, v);
 					pthread_mutex_unlock(&lock);
 
 				}
-				pthread_mutex_unlock(&v->mutex);
-
-				p = p->succ;
+        p = p->succ;
 
 				} while (p != h);
 			}
@@ -184,13 +183,11 @@ void liveness(cfg_t* cfg)
 {
 	vertex_t*	u;
 	list_t*		worklist;
-	
+  pthread_t	thread[4];
 
-	pthread_t	thread[4];
 	worklist = NULL;
 	pthread_mutex_init(&lock, NULL);
 
-	
 	for (int i = 0; i < cfg->nvertex; ++i) {
 		u = &cfg->vertex[i];
 
@@ -198,15 +195,13 @@ void liveness(cfg_t* cfg)
 		u->listed = true;
 	}
 
-
-	for(int i = 0; i < 4; i += 1){
+  for(int i = 0; i < 4; i += 1){
 		pthread_create(&thread[i], NULL, work, &worklist);
 	}
 
-	for(int i = 0; i < 4; i += 1){
+  for(int i = 0; i < 4; i += 1){
 		pthread_join(thread[i], NULL);
 	}
-
 }
 
 
@@ -216,7 +211,7 @@ void print_sets(cfg_t* cfg, FILE *fp)
 	vertex_t*	u;
 
 	for (i = 0; i < cfg->nvertex; ++i) {
-		u = &cfg->vertex[i]; 
+		u = &cfg->vertex[i];
 		fprintf(fp, "use[%zu] = ", u->index);
 		print_set(u->set[USE], fp);
 		fprintf(fp, "def[%zu] = ", u->index);
