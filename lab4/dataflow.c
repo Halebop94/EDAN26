@@ -125,9 +125,9 @@ vertex_t* take_first_sync(list_t list){
 	return u;
 }
 
-void* work(void* p)
+void* work(void* list_in)
 {
-		list_t** worklist = (list_t**)p;
+		list_t** worklist = (list_t**)list_in;
 		vertex_t*	u;
 		vertex_t*	v;
 		set_t*		prev;
