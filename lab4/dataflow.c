@@ -139,30 +139,30 @@ void* work(void* list_in)
 
 
 		while ((u = take_first_sync(worklist)) != NULL) {
-		pthread_mutex_lock(u->mutex);
+		pthread_mutex_lock(&u->mutex);
 		u->listed = false;
 		reset(u->set[OUT]);
-		pthread_mutex_unlock(u->mutex);
+		pthread_mutex_unlock(&u->mutex);
 
 		for (j = 0; j < u->nsucc; ++j){
-			pthread_mutex_lock(u->succ[j]->mutex);
+			pthread_mutex_lock(&u->succ[j]->mutex);
 			or(u->set[OUT], u->set[OUT], u->succ[j]->set[IN]);
-			pthread_mutex_unlock(u->succ[j]->mutex);
+			pthread_mutex_unlock(&u->succ[j]->mutex);
 		}
 			
-		pthread_mutex_lock(u->mutex);
+		pthread_mutex_lock(&u->mutex);
 		prev = u->prev;
 		u->prev = u->set[IN];
 		u->set[IN] = prev;
 		/* in our case liveness information... */
 		propagate(u->set[IN], u->set[OUT], u->set[DEF], u->set[USE]);
-		pthread_mutex_unlock(u->mutex);
+		pthread_mutex_unlock(&u->mutex);
 
 		if (u->pred != NULL && !equal(u->prev, u->set[IN])) {
 			p = h = u->pred;
 			do {
 				v = p->data;
-				pthread_mutex_lock(v->mutex);
+				pthread_mutex_lock(&v->mutex);
 				if (!v->listed) {
 					v->listed = true;
 					pthread_mutex_lock(&lock);
@@ -170,7 +170,7 @@ void* work(void* list_in)
 					pthread_mutex_unlock(&lock);
 
 				}
-				pthread_mutex_unlock(v->mutex);
+				pthread_mutex_unlock(&v->mutex);
 
 				p = p->succ;
 
