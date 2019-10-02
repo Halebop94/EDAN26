@@ -74,7 +74,7 @@ static void init_vertex(vertex_t* v, size_t index, size_t nsymbol, size_t max_su
 
 	v->index	= index;
 	v->succ		= calloc(max_succ, sizeof(vertex_t*));
-	pthread_mutex_init(v->mutex, NULL);
+	pthread_mutex_init(&v->mutex, NULL);
 
 
 	if (v->succ == NULL)
