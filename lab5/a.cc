@@ -8,6 +8,7 @@
 
 
 std::mutex m;
+std::condition_variable c;
 class worklist_t {
 	int*			a;
 	size_t			n;
