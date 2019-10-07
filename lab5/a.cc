@@ -8,6 +8,7 @@
 
 
 std::mutex m;
+std::mutex sum_mutex;
 std::condition_variable c;
 class worklist_t {
 	int*			a;
@@ -91,8 +92,7 @@ public:
 };
 
 static worklist_t*		worklist;
-std::atomic<unsigned long long> sum;
-//static unsigned long long	sum;
+static unsigned long long	sum;
 static int			iterations;
 static int			max;
 
@@ -120,7 +120,10 @@ static void consume()
 
 	while ((n = worklist->get()) > 0) {
 		f = factorial(n);
+		sum_mutex.lock();
 		sum += f;
+	    sum_mutex.unlock();
+
 	}
 }
 
