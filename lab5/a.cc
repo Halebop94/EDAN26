@@ -5,15 +5,20 @@
 #include <condition_variable>
 
 #include "timebase.h"
+std::mutex sumMtx;
 
 class worklist_t {
 	int*			a;
 	size_t			n;
 	size_t			total;	// sum a[0]..a[n-1]
-		
+	std::mutex m;
+	std::condition_variable c;
+
+
 public:
 	worklist_t(size_t max)
 	{
+
 		n = max+1;
 		total = 0;
 
@@ -25,7 +30,7 @@ public:
 	}
 
 	~worklist_t()
-	{	
+	{
 		free(a);
 	}
 
@@ -46,18 +51,18 @@ public:
 		int				i;
 		int				num;
 
-#if 0
+#if 1
 		/* hint: if your class has a mutex m
 		 * and a condition_variable c, you
-		 * can lock it and wait for a number 
+		 * can lock it and wait for a number
 		 * (i.e. total > 0) as follows.
 		 *
 		 */
 
 		std::unique_lock<std::mutex>	u(m);
 
-		/* the lambda is a predicate that 
-		 * returns false when waiting should 
+		/* the lambda is a predicate that
+		 * returns false when waiting should
 		 * continue.
 		 *
 		 * this mechanism will automatically
@@ -116,7 +121,9 @@ static void consume()
 
 	while ((n = worklist->get()) > 0) {
 		f = factorial(n);
+		sumMtx.lock();
 		sum += f;
+		sumMtx.unlock();
 	}
 }
 
@@ -144,7 +151,7 @@ int main(void)
 	double			end;
 	unsigned long long	correct;
 	int			i;
-	
+
 	printf("mutex/condvar and mutex for sum\n");
 
 	init_timebase();
