@@ -41,8 +41,10 @@ public:
 
 	void put(int num)
 	{
+	    m.lock();
 		a[num] += 1;
 		total += 1;
+		m.unlock();
 	}
 
 	int get()
