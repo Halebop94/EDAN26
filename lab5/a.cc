@@ -171,11 +171,12 @@ int main(void)
 		work();
 		end = timebase_sec();
 
+		sum_mutex.lock();
 		if (sum != correct) {
 			fprintf(stderr, "wrong output!\n");
 			abort();
 		}
-
+		sum_mutex.unlock();
 		printf("T = %1.2lf s\n", end - begin);
 	}
 
