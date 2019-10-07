@@ -7,15 +7,12 @@
 #include "timebase.h"
 std::mutex sumMtx;
 
-
-std::mutex sum_mutex;
-
 class worklist_t {
 	int*			a;
 	size_t			n;
 	size_t			total;	// sum a[0]..a[n-1]
-	std::condition_variable c;
 	std::mutex m;
+	std::condition_variable c;
 
 
 public:
@@ -59,6 +56,7 @@ public:
 		int				i;
 		int				num;
 
+#if 1
 		/* hint: if your class has a mutex m
 		 * and a condition_variable c, you
 		 * can lock it and wait for a number
@@ -80,6 +78,7 @@ public:
 		 */
 
 		c.wait(u, [this]() { return total > 0; } );
+#endif
 
 		for (i = 1; i <= n; i += 1)
 			if (a[i] > 0)
@@ -127,10 +126,9 @@ static void consume()
 
 	while ((n = worklist->get()) > 0) {
 		f = factorial(n);
-		sum_mutex.lock();
+		sumMtx.lock();
 		sum += f;
-	    sum_mutex.unlock();
-
+		sumMtx.unlock();
 	}
 }
 
@@ -178,12 +176,11 @@ int main(void)
 		work();
 		end = timebase_sec();
 
-		sum_mutex.lock();
 		if (sum != correct) {
 			fprintf(stderr, "wrong output!\n");
 			abort();
 		}
-		sum_mutex.unlock();
+
 		printf("T = %1.2lf s\n", end - begin);
 	}
 
