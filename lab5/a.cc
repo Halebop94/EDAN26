@@ -41,10 +41,8 @@ public:
 
 	void put(int num)
 	{
-	    m.lock();
 		a[num] += 1;
 		total += 1;
-		m.unlock();
 	}
 
 	int get()
@@ -52,7 +50,6 @@ public:
 		int				i;
 		int				num;
 
-#if 1
 		/* hint: if your class has a mutex m
 		 * and a condition_variable c, you
 		 * can lock it and wait for a number 
@@ -74,7 +71,6 @@ public:
 		 */
 
 		c.wait(u, [this]() { return total > 0; } );
-#endif
 
 		for (i = 1; i <= n; i += 1)
 			if (a[i] > 0)
