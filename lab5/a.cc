@@ -7,13 +7,15 @@
 #include "timebase.h"
 
 
-std::mutex m;
 std::mutex sum_mutex;
-std::condition_variable c;
+
 class worklist_t {
 	int*			a;
 	size_t			n;
 	size_t			total;	// sum a[0]..a[n-1]
+	std::condition_variable c;
+	std::mutex m;
+
 		
 public:
 	worklist_t(size_t max)
@@ -35,14 +37,19 @@ public:
 
 	void reset()
 	{
+		m.lock();
 		total = 0;
 		memset(a, 0, n*sizeof a[0]);
+		m.unlock();
 	}
 
 	void put(int num)
 	{
+		m.lock();
 		a[num] += 1;
 		total += 1;
+		m.unlock();
+		c.notify_all();
 	}
 
 	int get()
