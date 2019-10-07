@@ -6,6 +6,8 @@
 
 #include "timebase.h"
 
+
+std::mutex m;
 class worklist_t {
 	int*			a;
 	size_t			n;
