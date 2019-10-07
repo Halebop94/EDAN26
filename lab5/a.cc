@@ -46,7 +46,7 @@ public:
 		int				i;
 		int				num;
 
-#if 0
+#if 1
 		/* hint: if your class has a mutex m
 		 * and a condition_variable c, you
 		 * can lock it and wait for a number 
