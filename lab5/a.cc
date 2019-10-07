@@ -91,7 +91,8 @@ public:
 };
 
 static worklist_t*		worklist;
-static unsigned long long	sum;
+_Atomic long sum;
+//static unsigned long long	sum;
 static int			iterations;
 static int			max;
 
