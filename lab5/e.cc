@@ -15,6 +15,7 @@ public:
   void lock(){
 		bool expect = false;
     while( !flag.compare_exchange_weak(expect, true, std::memory_order_acq_rel, std::memory_order_release)){
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
 			expect = false;
 			while(flag);
 		}
@@ -153,6 +154,7 @@ static void work()
 
 	sum = 0;
 	worklist->reset();
+	produce();
 
 	std::thread p(produce);
 	std::thread a(consume);
@@ -160,7 +162,7 @@ static void work()
 	std::thread c(consume);
 	std::thread d(consume);
 
-	p.join();
+	//p.join();
 	a.join();
 	b.join();
 	c.join();
