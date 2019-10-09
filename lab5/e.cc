@@ -7,8 +7,6 @@
 
 #include "timebase.h"
 
-std::mutex sum_mutex;
-
 class Spinlock{
   std::atomic<bool> flag;
 public:
@@ -16,15 +14,17 @@ public:
 
   void lock(){
 		bool expect = false;
-    while(flag.compare_exchange_weak(expect,true, std::memory_order_acq_rel, std::memory_order_release));
+    while(flag.compare_exchange_weak(expect,true, std::memory_order_acq_rel, std::memory_order_release)){
+			expect = false;
+			while(flag);
+		}
   }
 
   void unlock(){
     flag.store(false, std::memory_order_release);
   }
-};
+}
 
-volatile int VAR;
 Spinlock spin;
 
 class worklist_t {
@@ -68,7 +68,7 @@ public:
 		a[num] += 1;
 		total += 1;
 		spin.unlock();
-		c.notify_all();
+		//c.notify_all();
 	}
 
 	int get()

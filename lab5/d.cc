@@ -7,8 +7,6 @@
 
 #include "timebase.h"
 
-std::mutex sum_mutex;
-
 class Spinlock{
   std::atomic_flag flag;
 public:
@@ -23,25 +21,6 @@ public:
   }
 };
 
-volatile int VAR;
-Spinlock spin;
-
-std::mutex sum_mutex;
-class Spinlock{
-  std::atomic_flag flag;
-public:
-  Spinlock(): flag(ATOMIC_FLAG_INIT) {}
-
-  void lock(){
-    while( flag.test_and_set(std::memory_order_acquire) );
-  }
-
-  void unlock(){
-    flag.clear(std::memory_order_release);
-  }
-};
-
-volatile int VAR;
 Spinlock spin;
 
 
@@ -86,7 +65,7 @@ public:
 		a[num] += 1;
 		total += 1;
 		spin.unlock();
-		c.notify_all();
+		//c.notify_all();
 	}
 
 	int get()
@@ -138,7 +117,7 @@ public:
 };
 
 static worklist_t*		worklist;
-static std::atomic<long> sum(0);
+static std::atomic<unsigned long long> sum(0);
 static int			iterations;
 static int			max;
 
@@ -214,7 +193,7 @@ int main(void)
 		begin = timebase_sec();
 		work();
 		end = timebase_sec();
-		
+
 		if (sum != correct) {
 			fprintf(stderr, "wrong output!\n");
 			abort();
