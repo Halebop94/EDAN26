@@ -8,8 +8,24 @@
 #include "timebase.h"
 std::mutex sumMtx;
 
-
 std::mutex sum_mutex;
+class Spinlock{
+  std::atomic_flag flag;
+public:
+  Spinlock(): flag(ATOMIC_FLAG_INIT) {}
+
+  void lock(){
+    while( flag.test_and_set(std::memory_order_acquire) );
+  }
+
+  void unlock(){
+    flag.clear(std::memory_order_release);
+  }
+};
+
+
+Spinlock spin;
+
 
 class worklist_t {
 	int*			a;
@@ -40,18 +56,18 @@ public:
 
 	void reset()
 	{
-		m.lock();
+		spin.lock();
 		total = 0;
 		memset(a, 0, n*sizeof a[0]);
-		m.unlock();
+		spin.unlock();
 	}
 
 	void put(int num)
 	{
-		m.lock();
+		spin.lock();
 		a[num] += 1;
 		total += 1;
-		m.unlock();
+		spin.unlock();
 		c.notify_all();
 	}
 
@@ -67,8 +83,8 @@ public:
 		 *
 		 */
 
-		std::unique_lock<std::mutex>	u(m);
-
+		//std::unique_lock<std::mutex>	u(m);
+		
 		/* the lambda is a predicate that
 		 * returns false when waiting should
 		 * continue.
@@ -79,9 +95,13 @@ public:
 		 * the destructor of u is called.
 		 *
 		 */
+		 
+		while(total==0){
+			spin.lock();
+			spin.unlock();
+		}
 
-		c.wait(u, [this]() { return total > 0; } );
-
+		spin.lock();
 		for (i = 1; i <= n; i += 1)
 			if (a[i] > 0)
 				break;
@@ -94,7 +114,7 @@ public:
 			abort();
 		} else
 			i = 0;
-
+		spin.unlock();
 		return i;
 	}
 };
