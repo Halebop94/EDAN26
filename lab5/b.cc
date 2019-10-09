@@ -88,7 +88,7 @@ public:
 };
 
 static worklist_t*		worklist;
-_Atomic unsigned long long	sum;
+std::atomic<ullong>	sum;
 static int			iterations;
 static int			max;
 
