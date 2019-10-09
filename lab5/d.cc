@@ -23,7 +23,7 @@ public:
   }
 };
 
-
+volatile int VAR;
 Spinlock spin;
 
 
@@ -148,9 +148,9 @@ static void consume()
 
 	while ((n = worklist->get()) > 0) {
 		f = factorial(n);
-		sum_mutex.lock();
+		VAR ^= 1234;
 		sum += f;
-	    sum_mutex.unlock();
+		VAR ^= 5678;
 
 	}
 }
