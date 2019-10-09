@@ -100,7 +100,7 @@ public:
 };
 
 static worklist_t*		worklist;
-static std::atomic<ullong> sum;
+static std::atomic<long> sum(0);
 static int			iterations;
 static int			max;
 
@@ -137,7 +137,6 @@ static void consume()
 
 static void work()
 {
-	sum = 0;
 	worklist->reset();
 
 	std::thread p(produce);
