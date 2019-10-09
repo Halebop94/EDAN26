@@ -10,16 +10,17 @@
 std::mutex sum_mutex;
 
 class Spinlock{
-  std::atomic flag;
+  std::atomic<bool> flag;
 public:
   Spinlock(): flag(ATOMIC_FLAG_INIT) {}
 
   void lock(){
-    while(flag.compare_exchange_weak);
+		bool expect = false;
+    while(flag.compare_exchange_weak(expect,true, std::memory_order_acl_rel, std::memoey_order_release));
   }
 
   void unlock(){
-    flag.clear(std::memory_order_release);
+    flag.store(false, std::memory_order_release);
   }
 };
 
