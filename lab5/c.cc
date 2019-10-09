@@ -2,17 +2,21 @@
 #include <cstring>
 #include <thread>
 #include <mutex>
+#include <atomic>
 #include <condition_variable>
 
 #include "timebase.h"
 std::mutex sumMtx;
 
+
+std::mutex sum_mutex;
+
 class worklist_t {
 	int*			a;
 	size_t			n;
 	size_t			total;	// sum a[0]..a[n-1]
-	std::mutex m;
 	std::condition_variable c;
+	std::mutex m;
 
 
 public:
@@ -56,7 +60,6 @@ public:
 		int				i;
 		int				num;
 
-#if 1
 		/* hint: if your class has a mutex m
 		 * and a condition_variable c, you
 		 * can lock it and wait for a number
@@ -78,7 +81,6 @@ public:
 		 */
 
 		c.wait(u, [this]() { return total > 0; } );
-#endif
 
 		for (i = 1; i <= n; i += 1)
 			if (a[i] > 0)
@@ -98,7 +100,7 @@ public:
 };
 
 static worklist_t*		worklist;
-static unsigned long long	sum;
+static std::atomic<long> sum(0);
 static int			iterations;
 static int			max;
 
@@ -126,14 +128,16 @@ static void consume()
 
 	while ((n = worklist->get()) > 0) {
 		f = factorial(n);
-		sumMtx.lock();
+		sum_mutex.lock();
 		sum += f;
-		sumMtx.unlock();
+	    sum_mutex.unlock();
+
 	}
 }
 
 static void work()
 {
+
 	sum = 0;
 	worklist->reset();
 
@@ -176,11 +180,12 @@ int main(void)
 		work();
 		end = timebase_sec();
 
+		sum_mutex.lock();
 		if (sum != correct) {
 			fprintf(stderr, "wrong output!\n");
 			abort();
 		}
-
+		sum_mutex.unlock();
 		printf("T = %1.2lf s\n", end - begin);
 	}
 
