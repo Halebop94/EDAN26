@@ -16,7 +16,7 @@ public:
 
   void lock(){
 		bool expect = false;
-    while(flag.compare_exchange_weak(expect,true, std::memory_order_acl_rel, std::memoey_order_release));
+    while(flag.compare_exchange_weak(expect,true, std::memory_order_acq_rel, std::memory_order_release));
   }
 
   void unlock(){
