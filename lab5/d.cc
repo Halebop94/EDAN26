@@ -26,6 +26,25 @@ public:
 volatile int VAR;
 Spinlock spin;
 
+std::mutex sum_mutex;
+class Spinlock{
+  std::atomic_flag flag;
+public:
+  Spinlock(): flag(ATOMIC_FLAG_INIT) {}
+
+  void lock(){
+    while( flag.test_and_set(std::memory_order_acquire) );
+  }
+
+  void unlock(){
+    flag.clear(std::memory_order_release);
+  }
+};
+
+volatile int VAR;
+Spinlock spin;
+
+
 class worklist_t {
 	int*			a;
 	size_t			n;
@@ -195,7 +214,7 @@ int main(void)
 		begin = timebase_sec();
 		work();
 		end = timebase_sec();
-
+		
 		if (sum != correct) {
 			fprintf(stderr, "wrong output!\n");
 			abort();
