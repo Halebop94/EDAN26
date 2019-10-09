@@ -100,7 +100,7 @@ public:
 };
 
 static worklist_t*		worklist;
-static std::atomic sum;
+static atomic sum;
 static int			iterations;
 static int			max;
 
