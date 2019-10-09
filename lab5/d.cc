@@ -21,15 +21,12 @@ public:
   }
 };
 
-volatile int VAR;
 Spinlock spin;
 
 class worklist_t {
 	int*			a;
 	size_t			n;
 	size_t			total;	// sum a[0]..a[n-1]
-	std::condition_variable c;
-	std::mutex m;
 
 
 public:
@@ -53,10 +50,9 @@ public:
 
 	void reset()
 	{
-		spin.lock();
 		total = 0;
 		memset(a, 0, n*sizeof a[0]);
-		spin.unlock();
+		//spin.unlock();
 	}
 
 	void put(int num)
@@ -65,7 +61,6 @@ public:
 		a[num] += 1;
 		total += 1;
 		spin.unlock();
-		//c.notify_all();
 	}
 
 	int get()
@@ -93,12 +88,12 @@ public:
 		 *
 		 */
 
+		spin.lock();
 		while(total==0){
-			spin.lock();
 			spin.unlock();
+			spin.lock();
 		}
 
-		spin.lock();
 		for (i = 1; i <= n; i += 1)
 			if (a[i] > 0)
 				break;
