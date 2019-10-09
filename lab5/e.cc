@@ -2,17 +2,36 @@
 #include <cstring>
 #include <thread>
 #include <mutex>
+#include <atomic>
 #include <condition_variable>
 
 #include "timebase.h"
-std::mutex sumMtx;
+
+std::mutex sum_mutex;
+
+class Spinlock{
+  std::atomic flag;
+public:
+  Spinlock(): flag(ATOMIC_FLAG_INIT) {}
+
+  void lock(){
+    while(flag.compare_exchange_weak);
+  }
+
+  void unlock(){
+    flag.clear(std::memory_order_release);
+  }
+};
+
+volatile int VAR;
+Spinlock spin;
 
 class worklist_t {
 	int*			a;
 	size_t			n;
 	size_t			total;	// sum a[0]..a[n-1]
-	std::mutex m;
 	std::condition_variable c;
+	std::mutex m;
 
 
 public:
@@ -36,18 +55,18 @@ public:
 
 	void reset()
 	{
-		m.lock();
+		spin.lock();
 		total = 0;
 		memset(a, 0, n*sizeof a[0]);
-		m.unlock();
+		spin.unlock();
 	}
 
 	void put(int num)
 	{
-		m.lock();
+		spin.lock();
 		a[num] += 1;
 		total += 1;
-		m.unlock();
+		spin.unlock();
 		c.notify_all();
 	}
 
@@ -56,7 +75,6 @@ public:
 		int				i;
 		int				num;
 
-#if 1
 		/* hint: if your class has a mutex m
 		 * and a condition_variable c, you
 		 * can lock it and wait for a number
@@ -64,7 +82,7 @@ public:
 		 *
 		 */
 
-		std::unique_lock<std::mutex>	u(m);
+		//std::unique_lock<std::mutex>	u(m);
 
 		/* the lambda is a predicate that
 		 * returns false when waiting should
@@ -77,9 +95,12 @@ public:
 		 *
 		 */
 
-		c.wait(u, [this]() { return total > 0; } );
-#endif
+		while(total==0){
+			spin.lock();
+			spin.unlock();
+		}
 
+		spin.lock();
 		for (i = 1; i <= n; i += 1)
 			if (a[i] > 0)
 				break;
@@ -92,13 +113,13 @@ public:
 			abort();
 		} else
 			i = 0;
-
+		spin.unlock();
 		return i;
 	}
 };
 
 static worklist_t*		worklist;
-static unsigned long long	sum;
+static std::atomic<long> sum(0);
 static int			iterations;
 static int			max;
 
@@ -126,14 +147,13 @@ static void consume()
 
 	while ((n = worklist->get()) > 0) {
 		f = factorial(n);
-		sumMtx.lock();
-		sum += f;
-		sumMtx.unlock();
+		sum.fetch_add(f, std::memory_order_relaxed);
 	}
 }
 
 static void work()
 {
+
 	sum = 0;
 	worklist->reset();
 
@@ -180,7 +200,6 @@ int main(void)
 			fprintf(stderr, "wrong output!\n");
 			abort();
 		}
-
 		printf("T = %1.2lf s\n", end - begin);
 	}
 
