@@ -15,7 +15,7 @@ public:
   void lock(){
 		bool expect = false;
     while( !flag.compare_exchange_weak(expect, true, std::memory_order_acq_rel, std::memory_order_release)){
-			std::this_thread::sleep_for(std::chrono::microseconds(1));
+			//std::this_thread::sleep_for(std::chrono::microseconds(1));
 			expect = false;
 			while(flag);
 		}
