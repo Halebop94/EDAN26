@@ -7,6 +7,8 @@
 
 #include "timebase.h"
 
+std::mutex sum_mutex;
+
 class Spinlock{
   std::atomic_flag flag;
 public:
@@ -21,8 +23,8 @@ public:
   }
 };
 
+volatile int VAR;
 Spinlock spin;
-
 
 class worklist_t {
 	int*			a;
@@ -145,7 +147,7 @@ static void consume()
 
 	while ((n = worklist->get()) > 0) {
 		f = factorial(n);
-		sum.fetch_add(f, std::memory_order_relaxed);
+		sum.fetch_add(f,std::memory_order_relaxed);
 	}
 }
 
