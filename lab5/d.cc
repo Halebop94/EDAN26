@@ -7,8 +7,6 @@
 
 #include "timebase.h"
 
-std::mutex sum_mutex;
-
 class Spinlock{
   std::atomic_flag flag;
 public:
@@ -119,7 +117,7 @@ public:
 };
 
 static worklist_t*		worklist;
-static std::atomic<unsigned long long> sum(0);
+static std::atomic<unsigned long long> sum;
 static int			iterations;
 static int			max;
 
@@ -147,7 +145,7 @@ static void consume()
 
 	while ((n = worklist->get()) > 0) {
 		f = factorial(n);
-		sum.fetch_add(f,std::memory_order_relaxed);
+		sum.fetch_add(f, std::memory_order_relaxed);
 	}
 }
 
