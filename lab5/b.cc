@@ -137,6 +137,8 @@ static void consume()
 
 static void work()
 {
+
+	sum = 0;
 	worklist->reset();
 
 	std::thread p(produce);
