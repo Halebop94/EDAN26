@@ -2,9 +2,10 @@
 #include <cstring>
 #include <thread>
 #include <mutex>
-#include <atomic>
 #include <condition_variable>
-
+#include <iostream>
+#include <atomic>
+#include <chrono>
 #include "timebase.h"
 
 class Spinlock{
@@ -15,7 +16,7 @@ public:
   void lock(){
 		bool expect = false;
     while( !flag.compare_exchange_weak(expect, true, std::memory_order_acq_rel, std::memory_order_release)){
-			//std::this_thread::sleep_for(std::chrono::microseconds(1));
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
 			expect = false;
 			while(flag);
 		}
@@ -154,15 +155,15 @@ static void work()
 
 	sum = 0;
 	worklist->reset();
-	
+	produce();
 
-	std::thread p(produce);
+	//std::thread p(produce);
 	std::thread a(consume);
 	std::thread b(consume);
 	std::thread c(consume);
 	std::thread d(consume);
 
-	p.join();
+	//p.join();
 	a.join();
 	b.join();
 	c.join();
