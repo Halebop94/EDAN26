@@ -20,7 +20,7 @@ fn main() {
 	let accounts_protection = Arc::new(Mutex::new(accounts));
 
 	for _ in 0 .. num_threads {
-		let a = accounts_protection;
+		let a = &accounts_protection;
 		let h = thread::spawn(move || {
 			let mut rng = rand::thread_rng();
 
@@ -38,6 +38,8 @@ fn main() {
 				}
 
 				let array = a.lock().unwrap();
+
+				
 
 			}
 		});
