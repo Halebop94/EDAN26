@@ -38,8 +38,9 @@ fn main() {
 				}
 
 				let array = a.lock().unwrap();
+				accounts[i].start_balance += amount;
+				accounts[j].start_balance -= amount;
 
-				
 
 			}
 		});
