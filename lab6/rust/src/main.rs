@@ -5,10 +5,10 @@ extern crate rand;
 use rand::Rng;
 
 fn main() {
-	let start_balance = 1000;
-	let num_transactions = 1000;
+	let start_balance = 10000;
+	let num_transactions = 10000;
 	let num_threads = 10;
-	let num_accounts = 1000;
+	let num_accounts = 10000;
 	let max_amount = 20;
 	let mut threads = vec![];
 	let mut accounts = vec![];
