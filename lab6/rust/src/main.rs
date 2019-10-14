@@ -38,8 +38,10 @@ fn main() {
 				}
 
 				let array = a.lock().unwrap();
-				let mut balance = array[i].lock().unwrap();
-				*balance += amount;
+				let mut balancefrom = array[i].lock().unwrap();
+				*balancefrom -= amount;
+				let mut balanceto = array[j].lock().unwrap();
+				*balanceto += amount;
 				
 
 			}
