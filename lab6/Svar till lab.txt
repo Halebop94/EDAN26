@@ -1,0 +1,1 @@
+3. Kompilationserror: Vi behöver kopiera accounts_protection. Skapar en kopia för att variabeln ska kunna äga värdet undansparat i den. Finns bara en ägare åt gången.

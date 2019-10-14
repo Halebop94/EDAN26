@@ -44,6 +44,11 @@ fn main() {
 				*balanceto += amount;
 				
 
+				let mut balanceFrom = array[i].lock().unwrap();
+				*balanceFrom =- amount;
+				let mut balanceTo = array[j].lock().unwrap();
+				balanceTo =+ amount;
+
 			}
 		});
 		threads.push(h);
