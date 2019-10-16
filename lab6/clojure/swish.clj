@@ -2,7 +2,7 @@
 (def num-accounts 4)
 (def num-transactions 10)
 (def num-threads 1)
-(def extra-processing 1000)	
+(def extra-processing 1000)
 (def max-amount	100)
 
 (defrecord account [balance])
@@ -12,11 +12,12 @@
 (defn do-extra-processing [n]
 	(if (>= n 1)
 		(recur (- n 1))))
-		
+
 (defn swish [from to amount]
 	(do-extra-processing extra-processing)
-	(update @(accounts from) :balance - amount)
-	(update @(accounts to) :balance + amount))
+	(dosync (ref-set accuunts from (update @(accounts from) :balance - amount))
+					(ref-set accounts to (update @(accounts to) :balance + amount)))
+
 
 (defn work [t]
 	(if (>= t 1)
