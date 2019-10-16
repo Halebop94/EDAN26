@@ -15,8 +15,8 @@
 
 (defn swish [from to amount]
 	(do-extra-processing extra-processing)
-	(ref-set accounts (update @(accounts from) :balance - amount))
-	(ref-set accounts (update @(accounts to) :balance + amount))
+	(dosync(ref-set accounts (update @(accounts from) :balance - amount))
+	(ref-set accounts (update @(accounts to) :balance + amount)))
 
 
 (defn work [t]
