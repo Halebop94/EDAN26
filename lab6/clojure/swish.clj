@@ -1,5 +1,5 @@
 (def start-balance 1000)
-(def num-accounts 4000)
+(def num-accounts 1000)
 (def num-transactions 100000)
 (def num-threads 6)
 (def extra-processing 1000)
