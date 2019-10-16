@@ -46,8 +46,10 @@ void error(char* fmt, ...)
 	exit(EXIT_FAILURE);
 }
 
-void __attribute__((transaction_safe)) extra_processing() { volatile int i; for (i = 0; i < PROCESSING; i += 1) ; }
-
+void __attribute__((transaction_safe)) extra_processing() { 
+	int i; 
+	for (i = 0; i < PROCESSING; i += 1); }
+	
 
 void swish(account_t* from, account_t* to, int amount)
 {
