@@ -52,12 +52,12 @@ void __attribute__((transaction_safe)) extra_processing() { volatile int i; for 
 void swish(account_t* from, account_t* to, int amount)
 {
 
-
 	if (from->balance - amount >= 0) {
 
+		__transaction_atomic {
 		extra_processing();
-		__transaction_atomic { from->balance -= amount; }
-		__transaction_atomic { to->balance += amount; }
+		from->balance -= amount;
+		 to->balance += amount; }
 	}
 
 }
