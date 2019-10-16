@@ -8,6 +8,9 @@ float a[N][N];
 float b[N][N];
 float c[N][N];
 
+#pragma omp parallel
+#pragma omp for
+
 void matmul()
 {
 	int	i, j, k;
