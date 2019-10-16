@@ -9,10 +9,10 @@
 
 #define	WIDTH			(14)		/* text width. */
 #define	START_BALANCE		(1000)		/* initial amount in each account. */
-#define	ACCOUNTS		(1000)		/* number of accounts. */
+#define	ACCOUNTS		(1000000)		/* number of accounts. */
 #define	TRANSACTIONS		(100000)	/* number of swish transaction to do. */
 #define	THREADS			(128)		/* number of threads. */
-#define	PROCESSING		(1000000)		/* amount of work per transaction. */
+#define	PROCESSING		(1000)		/* amount of work per transaction. */
 #define	MAX_AMOUNT		(100)		/* swish limit in one transaction. */
 
 typedef struct {
@@ -47,7 +47,7 @@ void error(char* fmt, ...)
 }
 
 void __attribute__((transaction_safe)) extra_processing() { 
-	int i; 
+	 int i; 
 	for (i = 0; i < PROCESSING; i += 1); }
 	
 
