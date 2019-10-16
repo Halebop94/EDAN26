@@ -17,8 +17,6 @@
 
 typedef struct {
 	int		balance;
-	pthread_mutex_t lock;
-	pthread_mutexattr_t attr;
 } account_t;
 
 account_t		account[ACCOUNTS];
@@ -59,14 +57,6 @@ void extra_processing()
 void swish(account_t* from, account_t* to, int amount)
 {
 
-  if(from < to){
-		pthread_mutex_lock(&from->lock);
-		pthread_mutex_lock(&to->lock);}
-	else {
-		pthread_mutex_lock(&to->lock);
-		pthread_mutex_lock(&from->lock);
-	}
-
 	if (from->balance - amount >= 0) {
 
 		extra_processing();
@@ -75,13 +65,6 @@ void swish(account_t* from, account_t* to, int amount)
 		to->balance += amount;
 	}
 
-	if(from < to) {
-		pthread_mutex_unlock(&from->lock);
-		pthread_mutex_unlock(&to->lock);
-	}else {
-		pthread_mutex_unlock(&to->lock);
-		pthread_mutex_unlock(&from->lock);
-	}
 }
 
 void* work(void* p)
@@ -126,9 +109,6 @@ int main(int argc, char** argv)
 
 	for (i = 0; i < ACCOUNTS; i += 1){
 		account[i].balance = START_BALANCE;
-		pthread_mutexattr_init(&account[i].attr);
-		pthread_mutexattr_settype(&account[i].attr, PTHREAD_MUTEX_RECURSIVE);
-		pthread_mutex_init(&account[i].lock, &account[i].attr);
 	}
 
 	for(i = 0; i < THREADS; i += 1){
